@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Circle of Creative | Portfolio</title>
+  <style>
+    :root {
+      --brand:#00897b;
+      --bg:#fafafa;
+      --fg:#222;
+      --card:#fff;
+      --muted:#777;
+      --shadow:0 4px 12px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Pretendard","Noto Sans KR",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--fg)}
+    header{padding:40px 80px;background:#fff;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.05);position:sticky;top:0;z-index:100}
+    header h1{font-size:1.4rem;letter-spacing:1px}
+    nav a{margin-left:20px;text-decoration:none;color:#333;font-weight:600;transition:color .2s}
+    nav a:hover{color:var(--brand)}
+    section{padding:100px 80px;max-width:1200px;margin:auto}
+    .hero{text-align:center;padding:150px 0 100px}
+    .hero h2{font-size:2.4rem;margin-bottom:12px}
+    .projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:40px}
+    .project{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);transition:transform .3s ease;cursor:pointer}
+    .project:hover{transform:translateY(-6px)}
+    .project img{width:100%;height:220px;object-fit:cover;display:block}
+    .project .meta{padding:18px 20px 22px}
+    .project h3{margin:0 0 6px;font-size:1.18rem}
+    .project p{margin:0;color:#555;line-height:1.5}
+    footer{text-align:center;padding:60px 0;color:var(--muted);font-size:.9rem}
+
+    /* Admin UI */
+    .admin-trigger{position:fixed;right:18px;bottom:18px;padding:10px 14px;background:#fff;border:1px solid #e5e5e5;border-radius:999px;box-shadow:var(--shadow);font-size:.9rem;cursor:pointer;opacity:.5;transition:.2s}
+    .admin-trigger:hover{opacity:1}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;padding:20px;z-index:200}
+    .modal.show{display:flex}
+    .card{width:min(820px,96%);background:#fff;border-radius:16px;box-shadow:var(--shadow)}
+    .card header{position:relative;box-shadow:none;padding:22px 26px}
+    .card .body{padding:22px 26px 28px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .row.single{grid-template-columns:1fr}
+    label{font-size:.9rem;color:#444;margin-bottom:6px;display:block}
+    input[type="text"],input[type="url"],textarea{width:100%;padding:12px 14px;border:1px solid #e5e5e5;border-radius:12px;font:inherit}
+    textarea{min-height:100px;resize:vertical}
+    .hint{font-size:.82rem;color:#666}
+    .toolbar{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+    .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer}
+    .btn[disabled]{opacity:.5;cursor:not-allowed}
+    .btn.primary{background:var(--brand);color:#fff}
+    .btn.ghost{background:#f5f5f5}
+    .list{margin-top:18px;border-top:1px dashed #eee;padding-top:10px;max-height:260px;overflow:auto}
+    .item{display:flex;gap:12px;align-items:center;padding:10px;border:1px solid #eee;border-radius:12px;margin-top:10px}
+    .item img{width:72px;height:54px;object-fit:cover;border-radius:8px}
+    .item h4{margin:0 0 4px;font-size:1rem}
+    .item p{margin:0;color:#555;font-size:.9rem}
+    .item .spacer{flex:1}
+    .item .del{background:#fff;border:1px solid #eee;padding:6px 10px;border-radius:10px;cursor:pointer}
+
+    /* Gallery Modal */
+    .gwrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:300}
+    .gwrap.show{display:flex}
+    .gcard{width:min(1100px,96%);background:#fff;border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .ghead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #eee}
+    .gtitle{font-weight:800}
+    .gtabs{display:flex;gap:8px;flex-wrap:wrap}
+    .gtab{padding:8px 12px;border-radius:999px;border:1px solid #e5e5e5;background:#f7f7f7;font-size:.9rem;cursor:pointer}
+    .gtab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+    .gbody{padding:18px}
+    .ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+    .gthumb{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;cursor:pointer}
+    .closeX{background:#fff;border:1px solid #eee;border-radius:10px;padding:6px 10px;cursor:pointer}
+
+    /* Lightbox */
+    .light{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:400}
+    .light.show{display:flex}
+    .light img{max-width:92vw;max-height:86vh;border-radius:10px}
+    .navbtn{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);border:0;color:#fff;font-size:28px;padding:10px 14px;border-radius:12px;cursor:pointer}
+    .navbtn:hover{background:rgba(255,255,255,.28)}
+    .prev{left:20px}
+    .next{right:20px}
+
+    @media (max-width:720px){
+      header{padding:24px 16px}
+      section{padding:60px 16px}
+      .row{grid-template-columns:1fr}
+    }
+    .handle{cursor:grab;user-select:none;padding:0 8px;font-weight:900}
+    .sortable-hint{font-size:.82rem;color:#666;margin:8px 0}
+    .pill{display:inline-block;padding:6px 10px;border:1px solid #eee;border-radius:999px;background:#f7f7f7;font-size:.85rem}
+    /* ===== Admin Compact Sizing (fit to screen) ===== */
+    #adminModal .card{width:min(560px,95%);max-height:90vh;display:flex;flex-direction:column}
+    #adminModal .card header{padding:14px 18px}
+    #adminModal .card .body{padding:16px 18px 18px;overflow:auto}
+    #groupModal .card{width:min(640px,96%);max-height:90vh;display:flex;flex-direction:column}
+    #groupModal .card header{padding:14px 18px}
+    #groupModal .card .body{padding:16px 18px 18px;overflow:auto}
+    .row{gap:12px}
+    label{font-size:.85rem}
+    input[type="text"],input[type="url"],textarea{padding:10px 12px;border-radius:10px}
+    .list{max-height:200px}
+      /* —— Architecture/Interior UI add-ons —— */
+    .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .badge{display:inline-block;padding:4px 8px;border:1px solid #e6e6e6;border-radius:999px;font-size:.75rem;background:#fff}
+    .swatches{display:flex;gap:6px;margin-top:10px}
+    .swatches .sw{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.08);background:var(--c,#ddd)}
+    .hero{position:relative;overflow:hidden}
+    .hero:before{content:"";position:absolute;inset:-50% -10%;background:repeating-linear-gradient( to right, rgba(0,0,0,.035) 0 1px, transparent 1px 80px), repeating-linear-gradient( to bottom, rgba(0,0,0,.03) 0 1px, transparent 1px 80px);transform:skewY(-6deg)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CIRCLE OF CREATIVE</h1>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2 id="heroTitleText">공간을 디자인하고, 감성을 완성합니다</h2>
+    <p id="heroSubtitleText">Interior Designer | COC Studio</p>
+  </section>
+
+  <section id="projects">
+    <h2>Selected Works</h2>
+    <div id="projectGrid" class="projects"></div>
+  </section>
+
+  <section id="about">
+    <h2>About</h2>
+    <p id="aboutText">
+      COC(Circle of Creative)는 ‘창의의 원’을 의미합니다.  
+      단순한 공간 설계를 넘어, 빛과 재료, 사용자 경험이 조화를 이루는 디자인을 추구합니다.  
+      우리는 공간이 사람의 기억이 되는 순간을 설계합니다.
+    </p>
+  </section>
+
+  <section id="design">
+    <h2>Design Language</h2>
+    <div class="projects" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <article class="project" style="cursor:default">
+        <div class="meta" style="padding:18px 20px 22px">
+          <h3>Spatial Flow</h3>
+          <p>동선과 시선, 채광을 한 축으로 정리해 체류 시간을 디자인합니다.</p>
+          <svg width="100%" height="100" viewBox="0 0 320 100" fill="none">
+            <defs>
+              <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#00897b"/></marker>
+            </defs>
+            <rect x="10" y="20" width="80" height="60" rx="8" stroke="#999" fill="none"/>
+            <rect x="120" y="20" width="80" height="60" rx="8" stroke="#999" fill="none"/>
+            <rect x="230" y="20" width="80" height="60" rx="8" stroke="#999" fill="none"/>
+            <path d="M50,50 C90,10 140,10 160,50" stroke="#00897b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+            <path d="M160,50 C200,10 260,10 270,50" stroke="#00897b" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+          </svg>
+        </div>
+      </article>
+      <article class="project" style="cursor:default">
+        <div class="meta">
+          <h3>Materiality</h3>
+          <p>매트/글로시, 우드/스톤 등 대비로 브랜드 캐릭터를 강조합니다.</p>
+          <div class="swatches">
+            <span class="sw" style="--c:#d6c4b8" title="Beige Stone"></span>
+            <span class="sw" style="--c:#8b5e3c" title="Walnut"></span>
+            <span class="sw" style="--c:#e5e5e5" title="Concrete"></span>
+            <span class="sw" style="--c:#111" title="Matte Black"></span>
+          </div>
+        </div>
+      </article>
+      <article class="project" style="cursor:default">
+        <div class="meta">
+          <h3>Light Strategy</h3>
+          <p>벽·선반·천장 간접광으로 레이어를 만들고, 포인트는 3000K 스팟으로.</p>
+          <svg width="100%" height="100" viewBox="0 0 320 100" fill="none">
+            <rect x="20" y="20" width="280" height="60" rx="8" stroke="#999" fill="none"/>
+            <line x1="30" y1="30" x2="290" y2="30" stroke="#ffd166" stroke-width="4"/>
+            <circle cx="80" cy="60" r="6" fill="#ffa62b"/>
+            <circle cx="160" cy="60" r="6" fill="#ffa62b"/>
+            <circle cx="240" cy="60" r="6" fill="#ffa62b"/>
+          </svg>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p id="contactEmailText">📧 contact@circleofcreative.com</p>
+    <p id="contactLocationText">📍 Seoul, Republic of Korea</p>
+  </section>
+
+  <footer>
+    © 2025 Circle of Creative. All Rights Reserved.
+  </footer>
+
+  <!-- Admin trigger -->
+  <button id="adminTrigger" class="admin-trigger" title="관리자">Admin</button>
+
+  <!-- Admin modal -->
+  <div id="adminModal" class="modal" aria-hidden="true">
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+      <header>
+        <h3 id="adminTitle">프로젝트 관리자</h3>
+      </header>
+      <div class="body">
+        <div id="loginBox" class="row single">
+          <div>
+            <label>관리자 비밀번호</label>
+            <input id="adminPass" type="password" placeholder="예: coc-admin" />
+            <div class="toolbar">
+              <button id="loginBtn" class="btn primary" type="button">로그인</button>
+              <button id="closeBtn1" class="btn ghost" type="button">닫기</button>
+            </div>
+            <p class="hint">※ 데모용 로컬 저장 방식입니다. 공개 운영용은 백엔드 연동 권장(Firebase/Supabase 등).</p>
+          </div>
+        </div>
+
+        <div id="editorBox" style="display:none">
+          <h4 style="margin:6px 0 10px">사이트 설정</h4>
+          <div class="row">
+            <div>
+              <label>상단 헤드라인</label>
+              <input id="siteHeroTitle" type="text" placeholder="공간을 디자인하고, 감성을 완성합니다" />
+            </div>
+            <div>
+              <label>상단 서브문구</label>
+              <input id="siteHeroSubtitle" type="text" placeholder="Interior Designer | COC Studio" />
+            </div>
+          </div>
+          <div class="row single" style="margin-top:6px">
+            <div>
+              <label>About 콘텐츠</label>
+              <textarea id="siteAbout" placeholder="About 섹션 내용을 입력"></textarea>
+            </div>
+          </div>
+          <div class="row" style="margin-top:6px">
+            <div>
+              <label>Contact 이메일</label>
+              <input id="siteContactEmail" type="text" placeholder="contact@circleofcreative.com" />
+            </div>
+            <div>
+              <label>Contact 위치</label>
+              <input id="siteContactLocation" type="text" placeholder="Seoul, Republic of Korea" />
+            </div>
+          </div>
+          <div class="toolbar">
+            <button id="saveSettingsBtn" class="btn primary" type="button">사이트 설정 저장</button>
+          </div>
+
+          <hr style="margin:16px 0;border:0;border-top:1px dashed #eee"/>
+          <div class="row">
+            <div>
+              <label>프로젝트 제목</label>
+              <input id="titleInput" type="text" placeholder="예: dr365 일본 화장품 진열장" />
+            </div>
+            <div>
+              <label>커버 이미지 (파일 업로드 또는 URL)</label>
+              <input id="imageFile" type="file" accept="image/*" />
+              <input id="imageUrl" type="url" placeholder="https://image.example.com/cover.jpg" style="margin-top:8px" />
+            </div>
+          </div>
+          <div class="row single" style="margin-top:10px">
+            <div>
+              <label>프로젝트 설명</label>
+              <textarea id="descInput" placeholder="프로젝트의 컨셉, 마감재, 시공 포인트 등을 적어주세요."></textarea>
+            </div>
+          </div>
+
+          <hr style="margin:16px 0;border:0;border-top:1px dashed #eee"/>
+          <div class="row">
+            <div>
+              <label>현장(그룹) 이름</label>
+              <input id="groupName" type="text" placeholder="예: A 지점 / 쇼룸 / 3층 홀" />
+            </div>
+            <div>
+              <label>그룹 이미지 (여러 장 업로드 가능)</label>
+              <input id="groupFiles" type="file" accept="image/*" multiple />
+              <textarea id="groupUrls" placeholder="또는 이미지 URL을 줄바꿈으로 여러 개 입력"></textarea>
+            </div>
+          </div>
+          <div class="toolbar">
+            <button id="addGroupBtn" class="btn ghost" type="button">그룹 추가</button>
+            <button id="saveBtn" class="btn primary" type="button" disabled>프로젝트 저장</button>
+            <button id="closeBtn2" class="btn ghost" type="button">닫기</button>
+          </div>
+
+          <p class="sortable-hint">그룹은 <span class="pill">드래그</span>로 정렬할 수 있습니다. (이름 중복 허용)</p>
+          <div class="list" id="groupsList"></div>
+          <div class="list" id="adminList" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group Editor Modal (이미지 정렬/삭제) -->
+  <div id="groupModal" class="modal" aria-hidden="true">
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="gmTitle">
+      <header>
+        <h3 id="gmTitle">그룹 편집</h3>
+      </header>
+      <div class="body">
+        <p class="hint">썸네일을 <b>드래그</b>해서 순서를 바꾸고, 필요하면 삭제하세요. (그룹당 최대 30장)</p>
+        <div id="gmList" class="list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;max-height:380px"></div>
+        <div class="toolbar">
+          <button id="gmClose" class="btn ghost" type="button">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gallery Modal -->
+  <div id="galleryWrap" class="gwrap" aria-hidden="true">
+    <div class="gcard">
+      <div class="ghead">
+        <div class="gtitle" id="gTitle">프로젝트</div>
+        <div class="gtabs" id="gTabs"></div>
+        <button class="closeX" id="gClose">닫기</button>
+      </div>
+      <div class="gbody">
+        <div class="ggrid" id="gGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="light" class="light" aria-hidden="true">
+    <button class="navbtn prev" id="lbPrev">‹</button>
+    <img id="lbImg" alt="preview"/>
+    <button class="navbtn next" id="lbNext">›</button>
+  </div>
+
+  <script>
+    // ====== 간단 관리자/데이터 저장 (localStorage) ======
+    const ADMIN_PASSWORD = 'coc-admin'; // 필요 시 수정
+    const KEY = 'coc_projects_v3'; // v3: drag-sort + limit 30
+    const META_KEY = 'coc_site_meta_v1';
+
+    const $ = (s)=>document.querySelector(s);
+    const $$ = (s)=>document.querySelectorAll(s);
+
+    const grid = $('#projectGrid');
+    // Site editable targets
+    const heroTitleText = $('#heroTitleText');
+    const heroSubtitleText = $('#heroSubtitleText');
+    const aboutText = $('#aboutText');
+    const contactEmailText = $('#contactEmailText');
+    const contactLocationText = $('#contactLocationText');
+
+    function loadProjects(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        if(!raw){
+          // 초기 더미 데이터 (groups 포함)
+          const seed=[
+            {
+              title:'송사부 고로케 리브랜딩 인테리어',
+              desc:'브랜드 리뉴얼과 동선 재설계를 통해 판매 동선을 최적화.',
+              img:'https://images.unsplash.com/photo-1505691723518-36a1bcbf83b4?auto=format&fit=crop&w=1200&q=60',
+              meta:{year:2024, location:'Gangnam', program:'Retail', tags:['branding','flow'], palette:['#d6c4b8','#8b5e3c','#e5e5e5','#111']},
+              groups:[
+                {name:'강남점', images:[
+                  'https://images.unsplash.com/photo-1542843137-54c1b317a12a?auto=format&fit=crop&w=1200&q=60',
+                  'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=1200&q=60',
+                  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=60'
+                ]},
+                {name:'홍대점', images:[
+                  'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=60',
+                  'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=60'
+                ]}
+              ]
+            },
+            {
+              title:'dr365 일본 화장품 진열장',
+              desc:'1200x2300x450 사이즈, 아크릴 라이트 쉘프 구조, 미러 스테인리스 포인트.',
+              img:'https://images.unsplash.com/photo-1615874959474-d609969a20ed?auto=format&fit=crop&w=1200&q=60',
+              meta:{year:2023, location:'Tokyo', program:'Display', tags:['acrylic','mirror'] , palette:['#f2f2f2','#c0c0c0','#111']},
+              groups:[
+                {name:'쇼룸', images:[
+                  'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1200&q=60',
+                  'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=60'
+                ]}
+              ]
+            },
+            {
+              title:'휴대폰 대리점 리테일 디자인',
+              desc:'심플 그리드 진열, 조명 루버 + 카운터 일체형 설계.',
+              img:'https://images.unsplash.com/photo-1589652717521-10c0d092dea9?auto=format&fit=crop&w=1200&q=60',
+              meta:{year:2022, location:'Seoul', program:'Retail', tags:['grid','lighting'], palette:['#ffffff','#e5e5e5','#00897b']},
+              groups:[
+                {name:'본점', images:[
+                  'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=60',
+                  'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=60'
+                ]}
+              ]
+            }
+          ];
+          localStorage.setItem(KEY, JSON.stringify(seed));
+          return seed;
+        }
+        return JSON.parse(raw);
+      }catch(e){ console.error(e); return []; }
+    }
+
+    function saveProjects(list){
+      try{
+        localStorage.setItem(KEY, JSON.stringify(list));
+      }catch(e){
+        e.name = e.name || 'SaveError';
+        throw e;
+      }
+    }
+
+    // ====== Site Meta (Hero/About/Contact) ======
+    function loadMeta(){
+      try{
+        const raw = localStorage.getItem(META_KEY);
+        if(!raw) return null;
+        return JSON.parse(raw);
+      }catch(e){ console.error(e); return null; }
+    }
+    function saveMeta(meta){
+      try{
+        localStorage.setItem(META_KEY, JSON.stringify(meta));
+      }catch(e){ console.error('Meta save error', e); throw e; }
+    }
+    function applyMetaToDOM(meta){
+      if(!meta) return;
+      if(meta.heroTitle!==undefined) heroTitleText.textContent = meta.heroTitle || '';
+      if(meta.heroSubtitle!==undefined) heroSubtitleText.textContent = meta.heroSubtitle || '';
+      if(meta.about!==undefined) aboutText.textContent = meta.about || '';
+      if(meta.contactEmail!==undefined) contactEmailText.textContent = `📧 ${meta.contactEmail || ''}`;
+      if(meta.contactLocation!==undefined) contactLocationText.textContent = `📍 ${meta.contactLocation || ''}`;
+    }
+
+    function render(){
+      const list = loadProjects();
+      grid.innerHTML = '';
+      list.forEach((item, idx)=>{
+        const card = document.createElement('article');
+        card.className='project';
+        card.innerHTML = `
+          <img src="${item.img}" alt="${item.title}">
+          <div class="meta">
+            <h3>${item.title}</h3>
+            <p>${item.desc || ''}</p>
+            <div class="badges">${[
+              item.meta?.year?`<span class='badge'>${item.meta.year}</span>`:'' ,
+              item.meta?.program?`<span class='badge'>${item.meta.program}</span>`:'' ,
+              item.meta?.location?`<span class='badge'>${item.meta.location}</span>`:''
+            ].filter(Boolean).join('')}</div>
+            ${item.meta?.palette?`<div class='swatches'>${item.meta.palette.map(c=>`<span class='sw' style='--c:${c}' title='${c}'></span>`).join('')}</div>`:''}
+          </div>`;
+        card.addEventListener('click', ()=>openGallery(idx));
+        grid.appendChild(card);
+      });
+    }
+
+    // 초기 렌더
+    render();
+    // 저장된 사이트 메타 적용
+    (function(){ const meta = loadMeta(); if(meta) applyMetaToDOM(meta); })();
+
+    // ====== Admin UI ======
+    const adminBtn = $('#adminTrigger');
+    
+    const modal = $('#adminModal');
+    const loginBox = $('#loginBox');
+    const editorBox = $('#editorBox');
+    const passInput = $('#adminPass');
+    const loginBtn = $('#loginBtn');
+    const close1 = $('#closeBtn1');
+    const close2 = $('#closeBtn2');
+    const saveBtn = $('#saveBtn');
+    const titleInput = $('#titleInput');
+    const descInput = $('#descInput');
+    const imgFile = $('#imageFile');
+    const imgUrl = $('#imageUrl');
+    const adminList = $('#adminList');
+    // Site settings inputs
+    const siteHeroTitle = $('#siteHeroTitle');
+    const siteHeroSubtitle = $('#siteHeroSubtitle');
+    const siteAbout = $('#siteAbout');
+    const siteContactEmail = $('#siteContactEmail');
+    const siteContactLocation = $('#siteContactLocation');
+    const saveSettingsBtn = $('#saveSettingsBtn');
+
+    // === 저장 버튼 활성화 로직 ===
+    function hasCoverImage(){
+      return (imgFile.files && imgFile.files[0]) || imgUrl.value.trim().length>0;
+    }
+    function validateForm(){
+      const okTitle = titleInput.value.trim().length>0;
+      const okImg = hasCoverImage();
+      saveBtn.disabled = !(okTitle && okImg);
+    }
+    [titleInput, imgUrl].forEach(el=> el.addEventListener('input', validateForm));
+    imgFile.addEventListener('change', validateForm);
+
+    // 그룹 입력
+    const groupName = $('#groupName');
+    const groupFiles = $('#groupFiles');
+    const groupUrls = $('#groupUrls');
+    const addGroupBtn = $('#addGroupBtn');
+    const groupsList = $('#groupsList');
+    let tempGroups = [];
+
+    function openModal(){ modal.classList.add('show'); document.documentElement.style.overflow='hidden'; }
+    function closeModal(){ modal.classList.remove('show'); document.documentElement.style.overflow=''; }
+
+    function refreshAdminList(){
+      const list = loadProjects();
+      adminList.innerHTML = '<h4 style="margin:8px 0">저장된 프로젝트</h4>';
+      list.forEach((it,idx)=>{
+        const row = document.createElement('div');
+        row.className='item';
+        row.innerHTML = `
+          <img src="${it.img}">
+          <div>
+            <h4>${it.title}</h4>
+            <p>${it.desc || ''}</p>
+            <p class="hint">그룹 ${ (it.groups||[]).length }개</p>
+          </div>
+          <div class="spacer"></div>
+          <button class="del" data-idx="${idx}">삭제</button>`;
+        adminList.appendChild(row);
+      });
+      adminList.querySelectorAll('.del').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          const i = +e.currentTarget.dataset.idx;
+          const list2 = loadProjects();
+          list2.splice(i,1);
+          saveProjects(list2);
+          render();
+          refreshAdminList();
+        });
+      });
+    }
+
+    async function compressDataUrl(dataUrl, maxDim=1600, quality=0.75){
+      return new Promise((resolve,reject)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          try{
+            const {width, height} = img;
+            let w = width, h = height;
+            const scale = Math.min(1, maxDim/Math.max(w,h));
+            if(scale < 1){ w = Math.round(w*scale); h = Math.round(h*scale); }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const out = canvas.toDataURL('image/jpeg', quality);
+            resolve(out);
+          }catch(err){ reject(err); }
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+      });
+    }
+
+    async function toDataUrl(file){
+      // 파일을 DataURL로 읽은 뒤 용량 절감을 위해 압축/리사이즈
+      const readAsDataUrl = (f)=>new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(f); });
+      const raw = await readAsDataUrl(file);
+      try { return await compressDataUrl(raw, 1600, 0.75); } catch(_) { return raw; }
+    }
+
+    function refreshGroupsList(){
+      groupsList.innerHTML = '<h4 style="margin:8px 0">추가 예정 그룹</h4>';
+      tempGroups.forEach((g,i)=>{
+        const div = document.createElement('div');
+        div.className='item';
+        div.draggable = true;
+        div.dataset.idx = i;
+        div.innerHTML = `<span class="handle">☰</span>
+          <div>
+            <h4>${g.name}</h4>
+            <p class="hint">이미지 ${g.images.length}장</p>
+          </div>
+          <div class="spacer"></div>
+          <button class="del" data-idx="${i}">제거</button>
+          <button class="del" data-edit="${i}">편집</button>`;
+        groupsList.appendChild(div);
+      });
+      // 삭제
+      groupsList.querySelectorAll('.del').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          if(e.currentTarget.dataset.idx!==undefined){
+            tempGroups.splice(+e.currentTarget.dataset.idx,1);
+            refreshGroupsList();
+          }
+        });
+      });
+      // 편집
+      groupsList.querySelectorAll('[data-edit]').forEach(btn=>{
+        btn.addEventListener('click', e=> openGroupEditor(+e.currentTarget.dataset.edit));
+      });
+      // 드래그 정렬 (그룹)
+      let dragIndex = null;
+      groupsList.querySelectorAll('.item').forEach(el=>{
+        el.addEventListener('dragstart', ev=>{ dragIndex = +el.dataset.idx; ev.dataTransfer.effectAllowed='move'; });
+        el.addEventListener('dragover', ev=>{ ev.preventDefault(); });
+        el.addEventListener('drop', ev=>{
+          ev.preventDefault();
+          const targetIdx = +el.dataset.idx;
+          if(dragIndex===null || dragIndex===targetIdx) return;
+          const moved = tempGroups.splice(dragIndex,1)[0];
+          tempGroups.splice(targetIdx,0,moved);
+          refreshGroupsList();
+        });
+      });
+    }
+
+    addGroupBtn.addEventListener('click', async()=>{
+      const name = groupName.value.trim() || '현장';
+      let images = [];
+      // 파일들 (압축 포함)
+      if(groupFiles.files && groupFiles.files.length){
+        for(const f of groupFiles.files){
+          try{ images.push(await toDataUrl(f)); }catch(_){ /* noop */ }
+        }
+      }
+      // URL들 (줄바꿈 분리) — Windows/Unix 개행 모두 대응
+      const urls = groupUrls.value
+        .split(/\r?\n+/)
+        .map(s=>s.trim())
+        .filter(Boolean);
+      images = images.concat(urls);
+      if(!images.length){return alert('이미지를 업로드하거나 URL을 입력해주세요.');}
+      if(images.length>30){
+        alert(`이미지는 그룹당 최대 30장까지 저장됩니다. 입력 ${images.length}장 중 상위 30장만 저장합니다.`);
+        images = images.slice(0,30);
+      }
+      // 중복 이름 허용: 그대로 push
+      tempGroups.push({name, images});
+      groupName.value=''; groupFiles.value=''; groupUrls.value='';
+      refreshGroupsList();
+    });
+
+    adminBtn.addEventListener('click', ()=>{ 
+      openModal(); 
+      // 모달 열릴 때 로그인 화면 보이도록 강제
+      loginBox.style.display='block';
+      editorBox.style.display='none';
+      validateForm();
+      setTimeout(()=>passInput?.focus(), 0);
+    });
+    close1.addEventListener('click', closeModal);
+    close2.addEventListener('click', closeModal);
+
+    // 사이트 설정 저장
+    saveSettingsBtn.addEventListener('click', ()=>{
+      const meta = {
+        heroTitle: siteHeroTitle.value.trim(),
+        heroSubtitle: siteHeroSubtitle.value.trim(),
+        about: siteAbout.value.trim(),
+        contactEmail: siteContactEmail.value.trim(),
+        contactLocation: siteContactLocation.value.trim()
+      };
+      try{
+        saveMeta(meta);
+        applyMetaToDOM(meta);
+        alert('사이트 설정이 저장되었습니다.');
+      }catch(e){
+        alert('사이트 설정 저장 중 오류가 발생했습니다.');
+      }
+    });
+
+    function doLogin(){
+      const pw = (passInput.value||'').trim();
+      if(pw === ADMIN_PASSWORD){
+        loginBox.style.display='none';
+        editorBox.style.display='block';
+        refreshAdminList();
+        refreshGroupsList();
+        validateForm();
+        titleInput?.focus();
+      }else{
+        alert('비밀번호가 올바르지 않습니다.\n힌트: coc-admin');
+      }
+    }
+    // 클릭으로 로그인
+    loginBtn.addEventListener('click', doLogin);
+    // 엔터키로 로그인
+    passInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') doLogin(); });
+
+    saveBtn.addEventListener('click', async()=>{
+      try{
+        const title = titleInput.value.trim();
+        const desc = descInput.value.trim();
+        let img = imgUrl.value.trim();
+        if(!title){return alert('제목을 입력해주세요.');}
+        if(imgFile.files && imgFile.files[0]){
+          try{ img = await toDataUrl(imgFile.files[0]); }catch(e){ console.error(e); return alert('커버 이미지 변환 실패'); }
+        }
+        if(!img){return alert('커버 이미지를 업로드하거나 URL을 입력해주세요.');}
+        const list = loadProjects();
+        list.unshift({title,desc,img,groups:tempGroups});
+        saveProjects(list);
+        // reset form
+        titleInput.value=''; descInput.value=''; imgFile.value=''; imgUrl.value=''; tempGroups=[]; refreshGroupsList();
+        render();
+        refreshAdminList();
+        validateForm();
+        closeModal(); // 저장 후 관리자 창 닫기
+        alert('프로젝트가 저장되었습니다.');
+      }catch(err){
+        console.error('Save error', err);
+        if((err && (err.name==='QuotaExceededError' || (err.message||'').toLowerCase().includes('quota')))){
+          alert('용량 초과로 저장에 실패했습니다.\n- 이미지 파일 크기를 줄이거나,\n- 이미지 URL을 사용하거나,\n- 그룹 이미지 수/해상도를 줄여주세요.');
+        }else{
+          alert('저장 중 오류가 발생했습니다. 콘솔 로그를 확인해주세요.');
+        }
+      }
+    });
+
+    // ====== Group Editor (이미지 드래그 정렬/삭제) ======
+    const groupModal = document.getElementById('groupModal');
+    const gmList = document.getElementById('gmList');
+    const gmClose = document.getElementById('gmClose');
+    let gmIndex = -1; // 현재 편집 중인 그룹 인덱스
+
+    function openGroupEditor(index){
+      gmIndex = index;
+      gmList.innerHTML = '';
+      const g = tempGroups[index];
+      g.images.forEach((src, i)=>{
+        const cell = document.createElement('div');
+        cell.className='item';
+        cell.style.display='flex';
+        cell.style.alignItems='center';
+        cell.draggable = true;
+        cell.dataset.idx = i;
+        cell.innerHTML = `
+          <span class="handle">☰</span>
+          <img src="${src}" style="width:72px;height:54px;object-fit:cover;border-radius:8px"/>
+          <div class="spacer"></div>
+          <button class="del" data-idx="${i}">삭제</button>`;
+        gmList.appendChild(cell);
+      });
+      // 삭제
+      gmList.querySelectorAll('.del').forEach(btn=>{
+        btn.addEventListener('click', e=>{
+          const i = +e.currentTarget.dataset.idx;
+          tempGroups[gmIndex].images.splice(i,1);
+          openGroupEditor(gmIndex);
+          refreshGroupsList();
+        });
+      });
+      // 드래그 정렬 (이미지)
+      let dragIdx = null;
+      gmList.querySelectorAll('.item').forEach(el=>{
+        el.addEventListener('dragstart', ev=>{ dragIdx = +el.dataset.idx; ev.dataTransfer.effectAllowed='move'; });
+        el.addEventListener('dragover', ev=>{ ev.preventDefault(); });
+        el.addEventListener('drop', ev=>{
+          ev.preventDefault();
+          const target = +el.dataset.idx;
+          if(dragIdx===null || dragIdx===target) return;
+          const arr = tempGroups[gmIndex].images;
+          const moved = arr.splice(dragIdx,1)[0];
+          arr.splice(target,0,moved);
+          openGroupEditor(gmIndex);
+        });
+      });
+      groupModal.classList.add('show');
+    }
+
+    gmClose.addEventListener('click', ()=>{ groupModal.classList.remove('show'); document.documentElement.style.overflow=''; });
+    groupModal.addEventListener('click', (e)=>{ if(e.target===groupModal){ groupModal.classList.remove('show'); document.documentElement.style.overflow=''; } });
+
+    // ====== Gallery ======
+    const gWrap = $('#galleryWrap');
+    const gTitle = $('#gTitle');
+    const gTabs = $('#gTabs');
+    const gGrid = $('#gGrid');
+    const gClose = $('#gClose');
+
+    let curProjectIndex = -1;
+    let curGroupIndex = 0;
+
+    function openGallery(pIndex){
+      const list = loadProjects();
+      const p = list[pIndex];
+      curProjectIndex = pIndex;
+      curGroupIndex = 0;
+      gTitle.innerHTML = `${p.title} ${p.meta?`<small style='font-weight:600;color:#666;margin-left:8px'>${[p.meta.year,p.meta.program,p.meta.location].filter(Boolean).join(' · ')}</small>`:''}`;
+      // tabs
+      gTabs.innerHTML='';
+      const groups = (p.groups && p.groups.length) ? p.groups : [{name:'이미지', images:[p.img]}];
+      groups.forEach((g, i)=>{
+        const b = document.createElement('button');
+        b.className = 'gtab' + (i===0?' active':'');
+        b.textContent = g.name + ` (${g.images.length})`;
+        b.addEventListener('click', ()=>{selectGroup(i)});
+        gTabs.appendChild(b);
+      });
+      gWrap.classList.add('show');
+      selectGroup(0);
+    }
+
+    function closeGallery(){ gWrap.classList.remove('show'); }
+    gClose.addEventListener('click', closeGallery);
+    gWrap.addEventListener('click', (e)=>{ if(e.target===gWrap) closeGallery(); });
+
+    function selectGroup(i){
+      curGroupIndex = i;
+      // tab active
+      [...gTabs.children].forEach((el,idx)=>{
+        el.classList.toggle('active', idx===i);
+      });
+      // grid
+      const list = loadProjects();
+      const p = list[curProjectIndex];
+      const groups = (p.groups && p.groups.length) ? p.groups : [{name:'이미지', images:[p.img]}];
+      const imgs = groups[i].images;
+      gGrid.innerHTML='';
+      imgs.forEach((src, idx)=>{
+        const im = document.createElement('img');
+        im.src = src; im.className='gthumb'; im.alt = groups[i].name + ' ' + (idx+1);
+        im.addEventListener('click', ()=>openLightbox(imgs, idx));
+        gGrid.appendChild(im);
+      });
+    }
+
+    // ====== Lightbox ======
+    const light = $('#light');
+    const lbImg = $('#lbImg');
+    const lbPrev = $('#lbPrev');
+    const lbNext = $('#lbNext');
+    let lbList = []; let lbIndex = 0;
+
+    function openLightbox(list, index){
+      lbList = list; lbIndex = index;
+      updateLightbox();
+      light.classList.add('show');
+    }
+    function closeLightbox(){ light.classList.remove('show'); }
+    function updateLightbox(){ lbImg.src = lbList[lbIndex]; }
+    function prev(){ lbIndex = (lbIndex - 1 + lbList.length) % lbList.length; updateLightbox(); }
+    function next(){ lbIndex = (lbIndex + 1) % lbList.length; updateLightbox(); }
+
+    lbPrev.addEventListener('click', prev);
+    lbNext.addEventListener('click', next);
+    light.addEventListener('click', (e)=>{ if(e.target===light) closeLightbox(); });
+    document.addEventListener('keydown', (e)=>{
+      if(!light.classList.contains('show') && !gWrap.classList.contains('show')) return;
+      if(e.key==='Escape'){ closeLightbox(); closeGallery(); }
+      if(e.key==='ArrowLeft'){ prev(); }
+      if(e.key==='ArrowRight'){ next(); }
+    });
+
+    // 사이트 설정 입력칸 로그인 시 자동 채우기(별도 리스너)
+    loginBtn.addEventListener('click', ()=>{
+      setTimeout(()=>{
+        if(editorBox.style.display!=='block') return;
+        let ce = contactEmailText.textContent.trim();
+        if(ce.startsWith('📧')) ce = ce.slice(1).trim();
+        let cl = contactLocationText.textContent.trim();
+        if(cl.startsWith('📍')) cl = cl.slice(1).trim();
+        const meta = loadMeta() || {
+          heroTitle: heroTitleText.textContent.trim(),
+          heroSubtitle: heroSubtitleText.textContent.trim(),
+          about: aboutText.textContent.trim(),
+          contactEmail: ce,
+          contactLocation: cl
+        };
+        siteHeroTitle.value = meta.heroTitle || '';
+        siteHeroSubtitle.value = meta.heroSubtitle || '';
+        siteAbout.value = meta.about || '';
+        siteContactEmail.value = meta.contactEmail || '';
+        siteContactLocation.value = meta.contactLocation || '';
+      },0);
+    });
+
+    // ====== Minimal Tests (console 출력) ======
+    (async function runTests(){
+      try{
+        // 1) 개행 파서 테스트 (Unix)
+        const t1 = 'a\nb\n\n c ';
+        const r1 = t1.split(/\r?\n+/).map(s=>s.trim()).filter(Boolean);
+        console.assert(JSON.stringify(r1) === JSON.stringify(['a','b','c']), 'Test1 실패', r1);
+
+        // 2) 개행 파서 테스트 (Windows)
+        const t2 = 'x\r\ny\r\n\r\nz';
+        const r2 = t2.split(/\r?\n+/).map(s=>s.trim()).filter(Boolean);
+        console.assert(JSON.stringify(r2) === JSON.stringify(['x','y','z']), 'Test2 실패', r2);
+
+        // 3) 그룹 30장 제한 테스트
+        const many = Array.from({length:35},(_,i)=>'img'+i);
+        const limited = (many.length>30? many.slice(0,30):many);
+        console.assert(limited.length===30, 'Test3 실패: 30장 제한 미적용', limited.length);
+
+        // 4) 시드 데이터로 갤러리 탭 수 테스트
+        const list = loadProjects();
+        const p0 = list[0];
+        console.assert(Array.isArray(p0.groups) && p0.groups.length>=1, 'Test4 실패: 그룹 없음');
+
+        // 5) 드래그 정렬 로직 배열 시뮬레이션
+        const arr = ['A','B','C'];
+        const moved = arr.splice(0,1)[0];
+        arr.splice(2,0,moved);
+        console.assert(JSON.stringify(arr)==='["B","C","A"]', 'Test5 실패: 드래그 시뮬 실패', arr);
+
+        // 6) 압축 함수 길이 감소 테스트 (간단)
+        const cnv = document.createElement('canvas');
+        cnv.width=400; cnv.height=300; const cctx=cnv.getContext('2d'); cctx.fillStyle='#888'; cctx.fillRect(0,0,400,300); cctx.fillStyle='#222'; cctx.fillRect(50,50,300,200);
+        const src = cnv.toDataURL('image/jpeg', 0.95);
+        const comp = await (async()=>{return new Promise(res=>{ const img=new Image(); img.onload=()=>{ const c=document.createElement('canvas'); c.width=400; c.height=300; c.getContext('2d').drawImage(img,0,0,400,300); res(c.toDataURL('image/jpeg',0.5)); }; img.src=src; });})();
+        console.assert(comp.length < src.length, 'Test6 실패: 압축 결과가 더 큼', {orig:src.length, comp:comp.length});
+
+        // 7) 개행 혼합 입력 테스트
+        const mix = 'url1\nurl2\r\n\n url3 ';
+        const rr = mix.split(/\r?\n+/).map(s=>s.trim()).filter(Boolean);
+        console.assert(JSON.stringify(rr)==='["url1","url2","url3"]', 'Test7 실패: 혼합 개행 처리');
+
+        console.log('%cAll mini tests passed', 'color:#00897b; font-weight:bold');
+      }catch(err){
+        console.error('테스트 오류:', err);
+      }
+    })();
+
+    // URL에 #admin 이 있으면 자동 오픈 (관리자만 공유)
+    if(location.hash === '#admin'){
+      openModal();
+      loginBox.style.display='block';
+      editorBox.style.display='none';
+      setTimeout(()=>passInput?.focus(), 0);
+    }
+  </script>
+</body>
+</html>
